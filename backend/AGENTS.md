@@ -26,6 +26,9 @@ Construir API .NET 10 modular. Primer slice: autenticación local con PostgreSQL
 - Usar variables `Jwt__SecretKey` y `ConnectionStrings__DefaultConnection`.
 - Limitar paquetes directos a los requeridos por el plan.
 - Cambiar contrato compartido primero cuando cambie API, cookie, DTO o error.
+- Nomenclatura de BD en `snake_case`: tablas, columnas, índices, constraints y vistas (`users`, `is_active`, `created_at`, `uq_users_email`).
+- Código en inglés: clases, métodos, variables, namespaces, DTOs, archivos y rutas de API (`UserService`, `LoginRequest`, `GET /api/auth/me`).
+- Textos para el usuario en español de México (es-MX): mensajes de error, validaciones y cualquier cadena devuelta al cliente. No devolver mensajes de excepción crudos de .NET.
 
 ## Comandos previstos
 

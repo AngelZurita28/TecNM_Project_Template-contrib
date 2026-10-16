@@ -56,6 +56,14 @@ El proyecto se rige por los siguientes estándares arquitectónicos:
 
 ---
 
+## 🌐 Convenciones Transversales
+
+- **Nomenclatura de Base de Datos:** `snake_case` en tablas, columnas, índices, constraints y vistas de PostgreSQL.
+- **Idioma del Código:** inglés para todo identificador, archivo, ruta y API.
+- **Idioma de la Interfaz:** español de México (es-MX) para todo texto visible al usuario, mensajes de error y de estado.
+
+---
+
 ## 📋 Planes de Implementación (`plans/`)
 
 Las hojas de ruta, fases de ejecución técnica y planes de trabajo generados para agentes o desarrolladores se centralizan en el directorio `plans/`:
