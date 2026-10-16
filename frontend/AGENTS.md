@@ -40,6 +40,9 @@ Construir SPA Vue 3 con TypeScript. Primer slice: login local, guard preventivo,
 - Usar CSS nativo y tokens semánticos. Mantener formulario accesible y responsive.
 - No agregar Pinia ni dependencias sin uso directo.
 - Cambiar contrato compartido primero cuando cambie API, cookie, DTO o error.
+- Código en inglés: componentes, composables, tipos, variables, archivos y rutas (`LoginForm.vue`, `useAuth`, `UserResponse`).
+- Textos visibles al usuario en español de México (es-MX): etiquetas, títulos, botones, placeholders, mensajes de error y de estado (`"Credenciales incorrectas"`, `"Iniciar sesión"`).
+- No mezclar idiomas en la misma cadena. No dejar texto placeholder en inglés en la UI.
 
 ## Comandos previstos
 
