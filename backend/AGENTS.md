@@ -18,6 +18,8 @@ Construir API .NET 10 modular. Primer slice: autenticación local con PostgreSQL
 - Organizar por vertical slice.
 - Mantener controllers delgados. Poner reglas, consultas y tokens en services.
 - Usar EF Core async y PostgreSQL. No agregar Repository sin necesidad real.
+- Cero SQL en código: no escribir SQL en crudo (`raw SQL` / `FromSqlRaw`). Usar LINQ asíncrono con EF Core. Para consultas complejas o reportes de múltiples tablas, usar Vistas de Base de Datos (`CREATE VIEW`) mapeadas en EF Core.
+- Prevenir dobles peticiones: toda acción mutativa debe procesarse de forma única e idempotente en el servidor.
 - Exponer DTOs. Nunca exponer entidades EF.
 - Leer JWT desde cookie `auth_token`.
 - Mantener secretos y conexión fuera de Git.

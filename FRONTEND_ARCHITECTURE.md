@@ -71,4 +71,5 @@ root/
 - **Límites Modulares (Public API):** Uso de `index.ts` en cada módulo para exponer únicamente los componentes, tipos o rutas autorizadas para el consumo externo.
 - **Estado Encapsulado:** Los stores y composables residen en el módulo correspondiente, evitando estados globales innecesarios.
 - **Cliente HTTP Centralizado con Interceptores:** Manejo unificado de autenticación (JWT), estados de carga y códigos de respuesta comunes (401, 403, 500) en `shared/api/`.
+- **Prevención de Doble Petición (Unicidad de Acción):** Toda acción o mutación iniciada por el usuario debe ejecutarse de forma única sin permitir dobles peticiones. Las vistas y componentes deben deshabilitar visual y funcionalmente los elementos de disparo (`disabled`, `loading`) mientras la operación esté en curso, e incluir guardas de reentrancia en manejadores/composables (`if (isSubmitting.value) return;`) para evitar peticiones duplicadas por clics rápidos o eventos concurrentes.
 - **Co-localización de Tests:** Archivos de prueba (`*.spec.ts`) ubicados junto a sus respectivos componentes o utilidades para preservar la autonomía del slice.

@@ -9,6 +9,8 @@ const router = useRouter()
 const isLoggingOut = ref(false)
 
 async function endSession(): Promise<void> {
+  if (isLoggingOut.value) return
+
   isLoggingOut.value = true
 
   try {
@@ -25,7 +27,7 @@ async function endSession(): Promise<void> {
 </script>
 
 <template>
-  <UiButton variant="secondary" :loading="isLoggingOut" @click="endSession">
+  <UiButton variant="secondary" :loading="isLoggingOut" :disabled="isLoggingOut" @click="endSession">
     {{ isLoggingOut ? 'Cerrando sesión…' : 'Cerrar sesión' }}
   </UiButton>
 </template>

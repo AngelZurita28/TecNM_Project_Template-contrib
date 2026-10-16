@@ -36,6 +36,7 @@ Construir SPA Vue 3 con TypeScript. Primer slice: login local, guard preventivo,
 - Centralizar Axios e interceptores en `src/shared/api/`.
 - Usar `withCredentials: true`. Nunca leer ni guardar `auth_token`.
 - Usar `session_exp` solo como guard preventivo. API conserva autoridad.
+- Prevenir dobles peticiones: toda acción debe ser única. Bloquear reentrancia en manejadores/composables (`if (isSubmitting.value) return;`) y deshabilitar controles durante el procesamiento (`loading`, `disabled`).
 - Usar CSS nativo y tokens semánticos. Mantener formulario accesible y responsive.
 - No agregar Pinia ni dependencias sin uso directo.
 - Cambiar contrato compartido primero cuando cambie API, cookie, DTO o error.

@@ -75,3 +75,4 @@ Respuesta `401` de login usa mensaje genérico. No confirma si cuenta existe, es
 7. `/me` después de logout devuelve `401`.
 8. Frontend redirige a `/login` cuando falta, es inválido o vence `session_exp`.
 9. Respuesta `401` protegida limpia estado local y redirige a `/login`.
+10. Acciones en cliente y servidor previenen dobles peticiones: interfaz bloquea reentrancia mientras procesa y operaciones mutativas aseguran unicidad de ejecución.

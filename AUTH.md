@@ -47,8 +47,10 @@ El backend actúa como el único emisor de tokens institucionales, soportando m�
 - **Claims Estándar:** `sub` (UserId), `email`, `name`, `role`, `exp`, `iss`, `aud`.
 - **Validación:** Middleware de autenticación valida firma en cada endpoint protegido.
 - **Respuestas:** Retorna `401 Unauthorized` si el token falta, expiró o está alterado.
+- **Idempotencia y Unicidad:** Endpoints como logout son estrictamente idempotentes. Las acciones mutativas garantizan ejecución única frente a reintentos o llamadas concurrentes.
 
 ### Frontend (Vue 3 + TypeScript)
 - **Transporte:** Cliente HTTP (`shared/api/`) configurado con `withCredentials: true`.
 - **Interceptor 401:** Captura respuestas `401` en peticiones protegidas, limpia estado local y redirige a `/login`.
 - **Router Guards:** Valida la presencia y vigencia de `session_exp` antes de renderizar rutas protegidas.
+- **Prevención de Doble Envío:** Formularios y acciones (login, logout) implementan guardas de reentrancia y deshabilitan botones/controles durante el procesamiento para evitar peticiones duplicadas.

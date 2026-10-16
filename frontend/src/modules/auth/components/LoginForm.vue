@@ -31,6 +31,8 @@ function clearPasswordError(): void {
 }
 
 async function submit(): Promise<void> {
+  if (isSubmitting.value) return
+
   usernameError.value = username.value.trim() ? '' : 'Ingresa tu usuario.'
   passwordError.value = password.value ? '' : 'Ingresa tu contraseña.'
   formMessage.value = ''

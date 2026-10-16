@@ -44,5 +44,7 @@ Proyecto Web Backend/
 - **Spec-Driven Development (SDD):** Cada módulo contiene su carpeta `specs/` donde se definen reglas funcionales, contratos y criterios antes de la codificación o asistencia por IA.
 - **Thin Controllers:** Responsabilidad única de transporte HTTP; sin lógica de negocio.
 - **Fat Services:** Encapsulamiento completo de reglas de negocio, transacciones y consultas LINQ asíncronas.
+- **Cero SQL en Código y Uso de Vistas de BD:** Prohibido escribir sentencias SQL en crudo (`raw SQL`, `FromSqlRaw` o cadenas embebidas) en el código. Las consultas estándar se realizan con LINQ asíncrono sobre EF Core. Las consultas complejas (múltiples joins, agregaciones pesadas, reportes) deben encapsularse en **Vistas de Base de Datos** (`CREATE VIEW` en PostgreSQL) y mapearse como entidades de vista en EF Core.
+- **Prevención de Doble Petición e Idempotencia:** Cualquier acción mutativa (POST, PUT, DELETE) debe garantizar unicidad de ejecución sin dobles peticiones. El backend debe protegerse contra transacciones duplicadas o llamadas concurrentes con el mismo propósito (idempotencia en endpoints críticos).
 - **DTOs Desacoplados:** Transferencia de datos mediante modelos dedicados por módulo, sin exponer entidades del ORM.
 - **Aislamiento Modular:** Alta cohesión interna por módulo y mínimo acoplamiento transversal.

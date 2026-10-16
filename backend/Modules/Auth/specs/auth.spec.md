@@ -7,7 +7,7 @@ Este archivo añade responsabilidades backend. Contratos HTTP, DTOs, cookies y c
 ## Responsabilidades
 
 - `AuthController`: recibir HTTP, delegar lógica, escribir o eliminar cookies y devolver códigos acordados.
-- `AuthService`: consultar usuario async, rechazar usuario inactivo, validar hash y emitir JWT.
+- `AuthService`: consultar usuario async con LINQ (sin raw SQL), rechazar usuario inactivo, validar hash y emitir JWT.
 - `AuthService`: reconstruir usuario actual desde claims. No hacer segunda consulta en `/me`.
 - `AuthDTOs`: definir entrada y salida sin filtrar entidad EF.
 - `TecNMDbContext`: mapear usuarios y restricciones de persistencia.

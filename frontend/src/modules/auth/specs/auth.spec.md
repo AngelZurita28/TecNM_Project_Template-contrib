@@ -20,6 +20,7 @@ Este archivo añade responsabilidades frontend. Contratos HTTP, DTOs, cookies y 
 - No guardar JWT en memoria, Web Storage ni estado global.
 - No inferir autorización desde `session_exp`.
 - Evitar Pinia. Estado local basta para dos vistas.
+- Prevenir dobles peticiones: bloquear reentrancia en submit y logout con guardas tempranas (`isSubmitting`, `isLoggingOut`).
 - Borrar marca local aunque logout falle por red o sesión ausente.
 - Evitar redirección circular cuando login devuelve `401`.
 
