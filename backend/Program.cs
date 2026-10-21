@@ -37,13 +37,34 @@ if (string.IsNullOrWhiteSpace(issuer) || string.IsNullOrWhiteSpace(audience) || 
         "Jwt:Issuer, Jwt:Audience y Jwt:LifetimeHours=8 son obligatorios.");
 }
 
-var allowedOrigin = configuration["Cors:AllowedOrigin"]?.TrimEnd('/');
-if (string.IsNullOrWhiteSpace(allowedOrigin)
-    || !Uri.TryCreate(allowedOrigin, UriKind.Absolute, out var originUri)
-    || originUri.Scheme != Uri.UriSchemeHttps)
+var allowedOrigins = (configuration["Cors:AllowedOrigins"] ?? configuration["Cors:AllowedOrigin"])
+    ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .Select(origin => origin.TrimEnd('/'))
+    .ToArray();
+
+if (allowedOrigins is null || allowedOrigins.Length == 0)
 {
-    throw new InvalidOperationException(
-        "Cors__AllowedOrigin debe ser un origen HTTPS absoluto.");
+    if (builder.Environment.IsDevelopment())
+    {
+        allowedOrigins = ["https://localhost:5173", "http://localhost:5173"];
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            "Cors__AllowedOrigin o Cors__AllowedOrigins es obligatorio en producción.");
+    }
+}
+
+foreach (var origin in allowedOrigins)
+{
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var originUri)
+        || (!builder.Environment.IsDevelopment() && originUri.Scheme != Uri.UriSchemeHttps))
+    {
+        throw new InvalidOperationException(
+            builder.Environment.IsDevelopment()
+                ? $"El origen CORS '{origin}' debe ser una URI absoluta válida."
+                : $"El origen CORS '{origin}' debe ser un origen HTTPS absoluto.");
+    }
 }
 
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
@@ -55,7 +76,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
-    policy.WithOrigins(allowedOrigin).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+    policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
