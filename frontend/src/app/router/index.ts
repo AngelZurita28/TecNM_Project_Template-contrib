@@ -36,4 +36,8 @@ router.beforeEach((to) => {
   return true
 })
 
+router.afterEach((to) => {
+  document.title = to.name === 'login' ? 'Acceso institucional | TecNM' : 'Mi información | TecNM'
+})
+
 export default router

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UiCard, UiPageHeader, UiText, UiToggle } from '../../../shared/components'
+import { UiBasePage, UiCard, UiPageHeader, UiText, UiToggle } from '../../../shared/components'
 import { useTheme } from '../../../shared/composables/useTheme'
 import LoginForm from '../components/LoginForm.vue'
 
@@ -7,7 +7,7 @@ const { dark } = useTheme()
 </script>
 
 <template>
-  <div class="login-page">
+  <UiBasePage fluid class="login-page">
     <header class="login-header">
       <UiText as="div" class="login-brand">TecNM<UiText as="small">Campus Monclova</UiText></UiText>
       <UiToggle v-model="dark" type="switch" label="Modo oscuro" class="theme" />
@@ -21,7 +21,7 @@ const { dark } = useTheme()
     <footer class="login-footer">
       <UiText variant="body">Tecnológico Nacional de México · Campus Monclova</UiText>
     </footer>
-  </div>
+  </UiBasePage>
 </template>
 
 <style scoped>

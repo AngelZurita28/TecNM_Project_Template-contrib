@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TecNM.Api.Modules.Auth;
 
 [ApiController]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 [Route("api/auth")]
 public sealed class AuthController(AuthService authService) : ControllerBase
 {
@@ -16,7 +17,9 @@ public sealed class AuthController(AuthService authService) : ControllerBase
     {
         if (request is null
             || string.IsNullOrWhiteSpace(request.Username)
-            || string.IsNullOrEmpty(request.Password))
+            || request.Username.Length > 64
+            || string.IsNullOrEmpty(request.Password)
+            || request.Password.Length > 256)
         {
             return BadRequest();
         }
@@ -44,9 +47,9 @@ public sealed class AuthController(AuthService authService) : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public ActionResult<UserResponse> Me()
+    public async Task<ActionResult<UserResponse>> Me(CancellationToken cancellationToken)
     {
-        var user = authService.GetCurrentUser(User);
+        var user = await authService.GetCurrentUserAsync(User, cancellationToken);
         return user is null ? Unauthorized() : Ok(user);
     }
 

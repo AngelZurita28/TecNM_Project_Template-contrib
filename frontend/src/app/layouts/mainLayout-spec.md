@@ -73,7 +73,7 @@ Registrar rutas de ejemplo antes de usarlas. `to` acepta destinos de Vue Router.
 Grupo tiene `children`, sin ruta propia. Un nivel de grupos; hijos son páginas.
 Header despliega panel; sidebar expande lista. Teclado usa Tab, Enter/Espacio y Escape para cerrar.
 En móvil navegación permanece disponible. No se oculta listado del header.
-Muestra actual enlaza secciones de bienvenida mediante `/#colores`, `/#datos`, etc.
+El padrón enlaza secciones reales: cuenta, identidad, contacto, domicilio y emergencia.
 Reemplazar destinos por páginas reales al agregar módulos; no crear vistas ficticias para template.
 
 ## Verificación

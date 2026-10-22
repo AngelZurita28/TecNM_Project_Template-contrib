@@ -32,7 +32,7 @@ El backend actúa como el único emisor de tokens institucionales, soportando m�
    - Validación de hash en base de datos.
    - Emisión directa de cookies con JWT institucional.
 
-2. **Federación OAuth / OIDC (Microsoft Entra ID, Google):**
+2. **Federación OAuth / OIDC (Microsoft Entra ID, Google; extensión futura):**
    - El proveedor autentica y redirige al callback del backend.
    - Backend valida firma externa y busca/aprovisiona al usuario en BD local.
    - Backend emite las **mismas cookies con JWT institucional**.
@@ -44,7 +44,7 @@ El backend actúa como el único emisor de tokens institucionales, soportando m�
 
 ### Backend (.NET 10)
 - **Firma & Secreto:** Custodia `SecretKey` (HMAC-SHA256).
-- **Claims Estándar:** `sub` (UserId), `email`, `name`, `role`, `exp`, `iss`, `aud`.
+- **Claims Estándar:** `sub` (UserId), `person_id` (UUID permanente de persona), `email`, `name`, `role`, `exp`, `iss`, `aud`.
 - **Validación:** Middleware de autenticación valida firma en cada endpoint protegido.
 - **Respuestas:** Retorna `401 Unauthorized` si el token falta, expiró o está alterado.
 - **Idempotencia y Unicidad:** Endpoints como logout son estrictamente idempotentes. Las acciones mutativas garantizan ejecución única frente a reintentos o llamadas concurrentes.

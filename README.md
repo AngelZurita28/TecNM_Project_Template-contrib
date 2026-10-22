@@ -4,6 +4,85 @@ Este repositorio sirve como la **plantilla oficial de referencia (template)** pa
 
 Su propósito es estandarizar la arquitectura, calidad de código y patrones de diseño en el desarrollo de software institucional, asegurando mantenibilidad, escalabilidad e interoperabilidad entre proyectos.
 
+
+## Padrón institucional listo para desarrollo
+
+Base mínima para alumnos, docentes y administrativos. Seis tablas: `people`, `users`, `students`, `employees`, `programs`, `departments`. Una persona conserva su UUID aunque cambie de matrícula, cuenta o vínculo. No incluye horarios, materias, calificaciones ni trámites.
+
+- [Auditoría del SQL histórico: 85 tablas](docs/legacy-database-review.md).
+- [Modelo y contrato de integración](docs/identity-model.md).
+- [Especificación del padrón](specs/people.spec.md).
+- [DDL PostgreSQL](database.sql), [semilla ficticia](seed-development.sql) y [visor relacional](visor_er.html).
+
+### Arranque completo con Docker
+
+Requisitos en el host: Docker con Compose, Python 3 y OpenSSL. Backend y frontend se compilan dentro de Docker.
+
+```bash
+bash scripts/setup-dev.sh
+```
+
+El script inicia **tres contenedores separados** en el mismo Compose:
+
+| Contenedor | Acceso predeterminado |
+| --- | --- |
+| `tecnm-identity-frontend` | **https://localhost:5173** |
+| `tecnm-identity-backend` | https://localhost:7001/api/health |
+| `tecnm-identity-postgres` | `db:5432` en red interna, sin puerto publicado. |
+
+Frontend y backend publican solo en `127.0.0.1`. Frontend consulta `/api` mediante su proxy HTTPS al backend. Solo backend y PostgreSQL comparten la red privada de datos. Administración de la base: `docker compose exec db psql -U tecnm_app -d tecnm_identity`.
+
+Elegir puertos y comprobar disponibilidad:
+
+```bash
+bash scripts/setup-dev.sh --frontend-port 5180 --backend-port 7010
+bash scripts/setup-dev.sh --frontend-port 5180 --backend-port 7010 --check-ports
+```
+
+Si un puerto está ocupado, avisa y propone uno libre antes de construir o levantar contenedores. En terminal permite introducir otro; sin terminal termina con mensaje y código 2. No mata procesos ni cambia puertos silenciosamente. Permite reutilizar los puertos de sus propios contenedores al reiniciar.
+
+Los puertos y secretos se guardan en `.env` (ver [.env.example](.env.example)). Nombre alternativo: `--project-name tecnm-campus`. Otro nombre crea un proyecto y volumen independientes; no traslada los datos del proyecto anterior.
+
+El volumen `tecnm-identity_identity_data` conserva la base ya existente. DDL y semillas se cargan al crear una base vacía. Repetir el script conserva perfiles y contraseñas. No usar `docker compose down -v` si se quieren conservar datos.
+
+```bash
+docker compose ps
+docker compose logs -f
+docker compose stop
+# Reiniciar con configuración y certificados ya generados:
+docker compose up -d --wait
+# Tras cambiar código, reconstruir e iniciar:
+bash scripts/setup-dev.sh
+```
+
+El frontend sirve la compilación Vue con Nginx; no tiene recarga automática. HTTPS usa un certificado local autofirmado generado en `.docker/certs/`, ignorado por Git. El navegador puede pedir aceptar el certificado de desarrollo. En producción se requieren certificados y credenciales reales; esta configuración incluye usuarios demo.
+
+| Usuario | Perfil de prueba |
+| --- | --- |
+| `alumno` | Alumno inscrito; matrícula `M20260001`. |
+| `alumno.baja` | Alumno con baja temporal y sin inscripción. |
+| `docente` | Docente; empleado `D0003`. |
+| `administrativo` | Administrativo con permiso común. |
+| `admin` | Administrativo con permiso de administrador del sistema. |
+| `mixto` | Alumno, docente y administrativo en una sola persona. |
+
+Contraseña común: **`TecNM-Demo-2026!`**, exclusiva de desarrollo. Al entrar se muestran identidad, contacto, domicilio, emergencia y fichas aplicables. «Actualizar información» vuelve a consultar la base.
+
+### Verificación
+
+Con los tres contenedores activos:
+
+```bash
+python3 scripts/check-dev-ports.py
+python3 scripts/check-identity.py
+# Por defecto la API usa 7001; si se cambia, indicar URL para este smoke:
+API_URL=https://localhost:7001 bash scripts/smoke-auth.sh
+```
+
+`check-identity.py` verifica cuentas demo y modifica temporalmente su nombre, permiso y habilitación; restaura valores en `finally`. Usarlo solo con la base aislada de desarrollo. Verifica restricciones dentro de transacciones revertidas.
+
+`scriptAlumnosTEC.sql` se conserva intacto como fuente histórica SQL Server. No contiene las filas reales del padrón y no se ejecuta para instalar esta versión. Producción debe aplicar únicamente el DDL, cargar registros verificados y aprovisionar cuentas reales; no cargar la semilla demo.
+
 ---
 
 ## 🤖 Desarrollo Guiado por Especificaciones (Spec-Driven Development - SDD)
