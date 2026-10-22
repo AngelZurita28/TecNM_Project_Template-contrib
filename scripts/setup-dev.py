@@ -15,7 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = ROOT / '.env'
 KEYS = ('COMPOSE_PROJECT_NAME', 'TECNM_FRONTEND_PORT', 'TECNM_BACKEND_PORT',
-        'TECNM_DB_PASSWORD', 'TECNM_JWT_SECRET')
+        'TECNM_DB_PASSWORD')
 
 
 def read_settings():
@@ -39,12 +39,12 @@ def port_number(value):
 
 def project_name(value):
     if not re.fullmatch(r'tecnm-[a-z0-9][a-z0-9_-]{0,40}', value):
-        raise argparse.ArgumentTypeError('Usa un nombre como tecnm-padron: minúsculas, números y guiones.')
+        raise argparse.ArgumentTypeError('Usa un nombre como tecnm-servicio: minúsculas, números y guiones.')
     return value
 
 
-def run(command, *, capture=False, env=None, input=None):
-    return subprocess.run(command, cwd=ROOT, env=env, input=input, text=True,
+def run(command, *, capture=False, env=None):
+    return subprocess.run(command, cwd=ROOT, env=env, text=True,
                           stdout=subprocess.PIPE if capture else None,
                           stderr=subprocess.PIPE if capture else None, check=True)
 
@@ -154,9 +154,12 @@ def main():
     parser = argparse.ArgumentParser(description='Levanta frontend, backend y PostgreSQL privados con Docker Compose.')
     parser.add_argument('--frontend-port', type=port_number, default=settings.get('TECNM_FRONTEND_PORT', '5173'))
     parser.add_argument('--backend-port', type=port_number, default=settings.get('TECNM_BACKEND_PORT', '7001'))
-    parser.add_argument('--project-name', type=project_name, default=settings.get('COMPOSE_PROJECT_NAME', 'tecnm-identity'))
+    parser.add_argument('--project-name', type=project_name, default=settings.get('COMPOSE_PROJECT_NAME', 'tecnm-template'))
     parser.add_argument('--check-ports', action='store_true', help='Solo comprueba puertos; no modifica archivos ni contenedores.')
     args = parser.parse_args()
+    if not args.check_ports and not (ROOT / 'database.sql').is_file():
+        print('Falta database.sql en la raíz o no es un archivo regular. Crea el SQL de tu microservicio antes de iniciar.', file=sys.stderr)
+        return 2
     for executable in ['docker', 'openssl']:
         if not shutil.which(executable):
             print(f'Falta {executable}. Instálalo antes de ejecutar este script.', file=sys.stderr)
@@ -178,34 +181,19 @@ def main():
     settings.update(COMPOSE_PROJECT_NAME=args.project_name, TECNM_FRONTEND_PORT=str(ports['frontend']),
                     TECNM_BACKEND_PORT=str(ports['backend']))
     settings['TECNM_DB_PASSWORD'] = settings.get('TECNM_DB_PASSWORD') or secrets.token_hex(24)
-    settings['TECNM_JWT_SECRET'] = settings.get('TECNM_JWT_SECRET') or secrets.token_hex(32)
-    if len(settings['TECNM_JWT_SECRET'].encode()) < 32:
-        print('TECNM_JWT_SECRET debe contener al menos 32 bytes. Corrige .env; no se iniciaron contenedores.', file=sys.stderr)
-        return 2
     write_settings(settings)
     certificates()
     environment = dict(os.environ, **{key: settings[key] for key in KEYS})
     compose = ['docker', 'compose']
 
-    def execute(*arguments, capture=False, input=None):
-        return run(compose + list(arguments), capture=capture, env=environment, input=input)
-
-    def psql(statement):
-        return execute('exec', '-T', 'db', 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-At',
-                       '-U', 'tecnm_app', '-d', 'tecnm_identity', capture=True, input=statement).stdout.strip()
+    def execute(*arguments):
+        return run(compose + list(arguments), env=environment)
 
     try:
         execute('build')
         if not check_ports(ports, args.project_name, interactive=False):
             return 2
         execute('up', '-d', '--wait', '--wait-timeout', '120', 'db')
-        count = psql("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';")
-        if count == '0':
-            psql((ROOT / 'database.sql').read_text())
-        elif psql("SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND table_name='users' AND column_name='person_id';") != '1':
-            print('La base existente tiene otro esquema. Se conservó intacta; requiere migración explícita.', file=sys.stderr)
-            return 2
-        psql((ROOT / 'seed-development.sql').read_text())
         execute('up', '-d', '--wait', '--wait-timeout', '120', 'backend', 'frontend')
     except subprocess.CalledProcessError:
         print('No se pudo completar el arranque Docker. Los datos del volumen se conservan.', file=sys.stderr)
@@ -216,6 +204,7 @@ def main():
     print(f"\nTecNM listo:\n  Frontend: https://localhost:{ports['frontend']}\n  Backend:  https://localhost:{ports['backend']}/api/health\n"
           f"  Contenedores: {args.project_name}-frontend, {args.project_name}-backend, {args.project_name}-postgres\n"
           '  PostgreSQL: db:5432, accesible solo desde la red de datos del backend.\n'
+          '  database.sql: se ejecuta solo al inicializar un volumen nuevo.\n'
           '  Detener: docker compose stop\n  Logs: docker compose logs -f\n'
           '  HTTPS local usa un certificado autofirmado.')
     return 0

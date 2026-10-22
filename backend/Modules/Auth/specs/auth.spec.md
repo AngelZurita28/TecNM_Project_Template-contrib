@@ -1,32 +1,17 @@
-# Auth backend
+# Auth: estructura de integración
 
-Contrato compartido: [spec raíz de autenticación](../../../../specs/auth.spec.md).
+Contrato compartido: [spec raíz](../../../../specs/auth.spec.md).
 
-Este archivo añade responsabilidades backend. Contratos HTTP, DTOs, cookies y códigos viven solo en spec raíz.
+## Alcance
 
-## Responsabilidades
+`Modules/Auth` reserva la integración con la API del servicio de login TecNM. Actualmente solo contiene especificación y [guía de integración](../Integration/README.md).
 
-- `AuthController`: recibir HTTP, delegar lógica, escribir o eliminar cookies y devolver códigos acordados.
-- `AuthService`: consultar usuario async con LINQ (sin raw SQL), rechazar usuario inactivo, validar hash y emitir JWT.
-- `AuthService`: resolver cuenta vigente y perfil propio desde PostgreSQL con LINQ async; claims solo identifican sesión.
-- DTO propio incluye persona, alumno y empleado; nunca devuelve hash.
-- Middleware rechaza cuentas deshabilitadas en toda ruta protegida.
-- `AuthDTOs`: definir entrada y salida sin filtrar entidad EF.
-- `TecNMDbContext`: mapear usuarios y restricciones de persistencia.
-- `Program`: registrar DI, DbContext, CORS, autenticación y autorización.
+- No registrar servicios de autenticación ni middleware de validación provisional.
+- No crear cuentas, hashes, JWT, cookies, endpoints ni identidades de prueba.
+- No depender del esquema de base de datos de otro servicio.
+- Implementar cliente HTTP, DTOs y validación cuando exista el contrato oficial; mantener controllers delgados y secretos fuera de Git.
+- Cada microservicio define sus permisos después de validar la identidad mediante el mecanismo oficial.
 
-## Integración
+## Aceptación
 
-- Leer `auth_token` mediante `JwtBearerEvents.OnMessageReceived`.
-- Validar `iss`, `aud`, firma y expiración.
-- Configurar CORS con origen frontend explícito y credenciales.
-- Orden middleware: HTTPS, CORS, autenticación, autorización, controllers.
-- Usar `PasswordHasher<User>`. Nunca comparar contraseña en texto plano.
-- Fallar al iniciar si falta `Jwt__SecretKey` o no cumple fuerza mínima definida por implementación.
-
-## Verificación local
-
-- Probar service: credencial válida, contraseña inválida y usuario inactivo.
-- Probar claims y expiración emitidos.
-- Probar opciones de creación y eliminación de ambas cookies.
-- Ejecutar casos compartidos desde [spec raíz](../../../../specs/auth.spec.md).
+Backend compila y sirve `/api/health` sin autenticarse, sin secreto JWT y sin tablas de identidad. Las antiguas rutas Auth y People no están disponibles.
