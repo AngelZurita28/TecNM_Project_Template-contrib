@@ -4,6 +4,8 @@
 .agents/
 skills-lock.json
 .gemini/
+.aws
+.obsidian/
 
 # ==========================================
 # Frontend (Vue 3, Vite, TypeScript, Node)
