@@ -10,6 +10,11 @@ const router = createRouter({
       component: () => import('../layouts/MainLayout.vue'),
       children: homeRoutes,
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../../shared/views/NotFoundView.vue'),
+    },
   ],
   scrollBehavior(to, _from, savedPosition) {
     return savedPosition ?? (to.hash ? { el: to.hash, top: 24 } : { top: 0 })

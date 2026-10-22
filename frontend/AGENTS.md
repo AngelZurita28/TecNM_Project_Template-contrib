@@ -64,6 +64,7 @@ Verificación: inicio público sin sesión, tema claro/oscuro, navegación y res
 - [Contrato raíz](../specs/auth.spec.md): única fuente de verdad compartida.
 
 - [`src/shared/components/`](./src/shared/components/): biblioteca visual reutilizable; [spec](./src/shared/components/specs/components.spec.md).
+- [`src/shared/views/`](./src/shared/views/): vistas genéricas compartidas (404); [spec](./src/shared/views/specs/notFound.spec.md).
 
 - [`src/app/layouts/`](./src/app/layouts/mainLayout-spec.md): MainLayout persistente; configuración independiente de header, sidebar, marca y navegación.
 
