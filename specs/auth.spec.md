@@ -22,7 +22,10 @@ UserResponse
   username: string
   email: string
   name: string
-  role: "Admin" | "User"
+  role: "Admin" | "User" (permiso de cuenta, no tipo de persona)
+  isActive: boolean
+  createdAt: ISO-8601
+  person: PersonResponse (specs/people.spec.md; datos propios completos)
 ```
 
 Payload nulo, campo ausente o valor vacío: inválido. Backend recorta espacios externos de `username`. Backend no devuelve entidad de persistencia.
@@ -32,7 +35,7 @@ Payload nulo, campo ausente o valor vacío: inválido. Backend recorta espacios 
 | Método y ruta | Acceso | Entrada | Éxito | Error |
 | --- | --- | --- | --- | --- |
 | `POST /api/auth/login` | Público | `LoginRequest` JSON | `200 UserResponse` y cookies | `400` payload inválido; `401` credenciales incorrectas o usuario inactivo |
-| `GET /api/auth/me` | Protegido | Ninguna | `200 UserResponse` desde claims | `401` token ausente, vencido, alterado o inválido |
+| `GET /api/auth/me` | Protegido | Ninguna | `200 UserResponse` desde PostgreSQL | `401` token ausente, vencido, alterado, inválido o cuenta deshabilitada |
 | `POST /api/auth/logout` | Público | Ninguna | Siempre `204`; expira ambas cookies | Ninguno por sesión ausente |
 
 Respuesta `401` de login usa mensaje genérico. No confirma si cuenta existe, está inactiva o contraseña falla.
@@ -44,6 +47,7 @@ Respuesta `401` de login usa mensaje genérico. No confirma si cuenta existe, es
 - `session_exp`: timestamp Unix, no `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`.
 - Ambas cookies comparten expiración.
 - Logout elimina ambas cookies con misma ruta y opciones compatibles.
+- Respuestas de Auth no se almacenan en caché (`Cache-Control: no-store`).
 - Frontend envía credenciales en cada petición. Nunca lee ni guarda `auth_token`.
 - `session_exp` solo mejora UX. Backend conserva autoridad.
 - Desarrollo usa HTTPS para conservar `Secure=true`.
@@ -54,15 +58,17 @@ Respuesta `401` de login usa mensaje genérico. No confirma si cuenta existe, es
 - Claims requeridos: `sub`, `username`, `email`, `name`, `role`, `exp`, `iss`, `aud`.
 - `sub` contiene `UserResponse.id`.
 - `role` solo acepta `Admin` o `User`.
+- `person_id` contiene el UUID estable de la persona. Datos personales completos no se incluyen en JWT.
+- Cada petición protegida verifica que cuenta y persona sigan vinculadas y cuenta esté activa.
 - Backend valida firma, emisor, audiencia y expiración en cada ruta protegida.
 - `Jwt__SecretKey` vive fuera de Git. API falla al iniciar si falta o tiene menos de 32 bytes UTF-8.
 
 ## Datos demo
 
-- Usuarios activos de desarrollo: `admin` con rol `Admin`; `usuario` con rol `User`.
+- Cuentas de desarrollo: `alumno`, `alumno.baja`, `docente`, `administrativo`, `admin`, `mixto`. Solo `admin` tiene permiso `Admin`.
 - Contraseña común exclusiva de desarrollo: `TecNM-Demo-2026!`.
-- PostgreSQL guarda solo hashes creados con `PasswordHasher<User>`.
-- Producción no incluye credenciales demo.
+- PostgreSQL guarda solo hashes Identity V3 compatibles con `PasswordHasher<User>`, verificados en las pruebas de login.
+- Producción no incluye credenciales demo. DDL y semilla se ejecutan por separado.
 
 ## Casos de aceptación
 

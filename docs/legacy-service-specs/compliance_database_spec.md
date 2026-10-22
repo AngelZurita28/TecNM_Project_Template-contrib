@@ -1,3 +1,5 @@
+> Diseño histórico de un servicio externo. No pertenece al padrón ni se instala. Las referencias a tablas legacy deben sustituirse por UUID `personId` y consultas al padrón; periodos, archivos y calificaciones pertenecen a sus respectivos servicios.
+
 # Especificación de Base de Datos: Módulo de Cumplimiento Docente (Compliance)
 
 ## 1. Contexto y Objetivo

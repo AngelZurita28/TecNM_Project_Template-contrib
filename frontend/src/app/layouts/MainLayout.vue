@@ -25,7 +25,7 @@ const { dark } = useTheme()
     <RouterView />
     <template #footer>
       <span>Tecnológico Nacional de México</span>
-      <span>Campus Monclova · Sistema de diseño institucional</span>
+      <span>Campus Monclova · Padrón institucional</span>
       <LogoutButton v-if="!mainLayoutConfig.showHeader && !mainLayoutConfig.showSidebar" />
     </template>
   </UiShell>

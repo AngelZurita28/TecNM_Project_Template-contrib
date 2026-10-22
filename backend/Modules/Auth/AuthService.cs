@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TecNM.Api.Core.Entities;
 using TecNM.Api.Data;
+using TecNM.Api.Modules.People;
 
 namespace TecNM.Api.Modules.Auth;
 
@@ -24,8 +25,8 @@ public sealed class AuthService(
         string password,
         CancellationToken cancellationToken)
     {
-        var normalizedUsername = username.Trim();
-        var user = await dbContext.Users.SingleOrDefaultAsync(
+        var normalizedUsername = username.Trim().ToLowerInvariant();
+        var user = await Accounts().SingleOrDefaultAsync(
             item => item.Username == normalizedUsername,
             cancellationToken);
 
@@ -40,14 +41,21 @@ public sealed class AuthService(
             return null;
         }
 
+        if (verification == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            user.Password = passwordHasher.HashPassword(user, password);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         var expiresAt = DateTimeOffset.UtcNow.AddHours(jwtSettings.LifetimeHours);
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim("username", user.Username),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Name, user.Name),
-            new Claim("role", user.Role)
+            new Claim(JwtRegisteredClaimNames.Email, user.Person.InstitutionalEmail),
+            new Claim(JwtRegisteredClaimNames.Name, PersonMapping.FullName(user.Person)),
+            new Claim("role", user.Role),
+            new Claim("person_id", user.PersonId.ToString())
         };
         var token = new JwtSecurityToken(
             issuer: jwtSettings.Issuer,
@@ -65,26 +73,21 @@ public sealed class AuthService(
             expiresAt);
     }
 
-    public UserResponse? GetCurrentUser(ClaimsPrincipal principal)
+    public async Task<UserResponse?> GetCurrentUserAsync(ClaimsPrincipal principal, CancellationToken cancellationToken)
     {
-        var idValue = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        var username = principal.FindFirst("username")?.Value;
-        var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-        var name = principal.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
-        var role = principal.FindFirst("role")?.Value;
-
-        if (!Guid.TryParse(idValue, out var id)
-            || string.IsNullOrWhiteSpace(username)
-            || string.IsNullOrWhiteSpace(email)
-            || string.IsNullOrWhiteSpace(name)
-            || role is not ("Admin" or "User"))
-        {
+        if (!Guid.TryParse(principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var id))
             return null;
-        }
 
-        return new UserResponse(id, username, email, name, role);
+        var user = await Accounts().AsNoTracking().SingleOrDefaultAsync(
+            item => item.Id == id && item.IsActive, cancellationToken);
+        return user is null ? null : ToResponse(user);
     }
 
+    private IQueryable<User> Accounts() => dbContext.Users
+        .Include(item => item.Person).ThenInclude(item => item.Student).ThenInclude(item => item!.Program)
+        .Include(item => item.Person).ThenInclude(item => item.Employee).ThenInclude(item => item!.Department);
+
     private static UserResponse ToResponse(User user) =>
-        new(user.Id, user.Username, user.Email, user.Name, user.Role);
+        new(user.Id, user.Username, user.Person.InstitutionalEmail, PersonMapping.FullName(user.Person), user.Role,
+            user.IsActive, user.CreatedAt, PersonMapping.ToResponse(user.Person));
 }

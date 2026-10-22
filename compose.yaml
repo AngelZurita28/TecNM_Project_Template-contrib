@@ -1,0 +1,76 @@
+name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}
+services:
+  db:
+    image: postgres:15
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-postgres
+    environment:
+      POSTGRES_DB: tecnm_identity
+      POSTGRES_USER: tecnm_app
+      POSTGRES_PASSWORD: ${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
+    volumes:
+      - identity_data:/var/lib/postgresql/data
+      - ./database.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./seed-development.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    networks: [data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U tecnm_app -d tecnm_identity"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    image: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-backend:local
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: https://+:8081
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/localhost.crt
+      ASPNETCORE_Kestrel__Certificates__Default__KeyPath: /https/localhost.key
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=tecnm_identity;Username=tecnm_app;Password=${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
+      Jwt__SecretKey: ${TECNM_JWT_SECRET:?Ejecuta scripts/setup-dev.sh primero}
+      Cors__AllowedOrigins: https://localhost:${TECNM_FRONTEND_PORT:-5173},https://127.0.0.1:${TECNM_FRONTEND_PORT:-5173}
+    ports:
+      - "127.0.0.1:${TECNM_BACKEND_PORT:-7001}:8081"
+    volumes:
+      - ./.docker/certs:/https:ro
+    networks: [web, data]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--insecure", "https://localhost:8081/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-frontend:local
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-frontend
+    ports:
+      - "127.0.0.1:${TECNM_FRONTEND_PORT:-5173}:443"
+    volumes:
+      - ./.docker/certs:/https:ro
+    networks: [web]
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--no-check-certificate", "--output-document=/dev/null", "https://127.0.0.1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+networks:
+  web:
+    name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-web
+  data:
+    name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-data
+    internal: true
+volumes:
+  identity_data:

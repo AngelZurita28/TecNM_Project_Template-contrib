@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Construir API .NET 10 modular. Primer slice: autenticación local con PostgreSQL, JWT institucional y cookies seguras.
+Mantener padrón institucional .NET 10 con PostgreSQL. Slices activos: autenticación local y consulta de personas. JWT institucional en cookies seguras.
 
 ## Lectura obligatoria
 
@@ -44,8 +44,15 @@ Prueba de humo prevista: `curl` con cookie jar sobre HTTPS. Debe cubrir login in
 
 ## Mapa
 
-- [`Core/Entities/`](./Core/Entities/): entidades compartidas; `User` será entidad inicial.
+- [`Core/Entities/`](./Core/Entities/): personas, cuentas, alumnos, empleados, carreras y departamentos.
 - [`Data/`](./Data/): `TecNMDbContext` y mapeo PostgreSQL.
 - [`Modules/Auth/`](./Modules/Auth/): controller, service y DTOs del slice.
 - [`Modules/Auth/specs/`](./Modules/Auth/specs/): contexto backend de Auth.
 - [Contrato raíz](../specs/auth.spec.md): única fuente de verdad compartida.
+
+- [`Modules/People/`](./Modules/People/): consulta institucional por UUID o identificador; [spec](./Modules/People/specs/people.spec.md).
+- [Modelo institucional](../specs/people.spec.md): personas, cuentas y fichas; [auditoría histórica](../docs/legacy-database-review.md).
+
+- Solo Auth y People contienen lógica de negocio activa. Planes antiguos de Referrals/Metrics/Compliance están archivados en `docs/legacy-service-specs/`, fuera de este servicio.
+
+- [Arranque Docker](../specs/docker.spec.md): un Compose, contenedores separados, PostgreSQL privado y puertos comprobados. `bash scripts/setup-dev.sh` inicia todo.

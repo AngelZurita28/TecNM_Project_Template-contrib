@@ -13,7 +13,7 @@ Usar las cuatro durante trabajo frontend. Si alguna no existe o no puede cargars
 
 ## Objetivo
 
-Construir SPA Vue 3 con TypeScript. Primer slice: login local, guard preventivo, sesión visible y logout.
+Mantener SPA Vue 3 con TypeScript: login local, guard preventivo, consulta completa de ficha propia y logout.
 
 ## Lectura obligatoria
 
@@ -67,3 +67,7 @@ Verificación visual prevista: login, error genérico, carga, sesión, logout, r
 - [`src/shared/components/`](./src/shared/components/): biblioteca visual reutilizable; [spec](./src/shared/components/specs/components.spec.md).
 
 - [`src/app/layouts/`](./src/app/layouts/MAINLAYOUT.md): MainLayout persistente; configuración independiente de header, sidebar, marca y navegación.
+
+- [Padrón institucional](../specs/people.spec.md): perfil completo en SessionView; cuentas, personas y fichas alumno/personal.
+
+- [Arranque Docker](../specs/docker.spec.md): un Compose, contenedores separados, PostgreSQL privado y puertos comprobados. `bash scripts/setup-dev.sh` inicia todo.

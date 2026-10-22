@@ -1,4 +1,6 @@
 using System.Text;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using TecNM.Api.Core.Entities;
 using TecNM.Api.Data;
 using TecNM.Api.Modules.Auth;
+using TecNM.Api.Modules.People;
 
 const string FrontendCors = "Frontend";
 
@@ -73,6 +76,7 @@ var jwtSettings = new JwtSettings(issuer, audience, lifetimeHours.Value, signing
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TecNMDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<PeopleService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
@@ -113,6 +117,31 @@ builder.Services
                 }
 
                 return Task.CompletedTask;
+            },
+            OnTokenValidated = async context =>
+            {
+                var principal = context.Principal!;
+                if (!Guid.TryParse(principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var id)
+                    || !Guid.TryParse(principal.FindFirst("person_id")?.Value, out var personId))
+                {
+                    context.Fail("Sesión inválida.");
+                    return;
+                }
+
+                var db = context.HttpContext.RequestServices.GetRequiredService<TecNMDbContext>();
+                var account = await db.Users.AsNoTracking()
+                    .Where(item => item.Id == id && item.PersonId == personId && item.IsActive)
+                    .Select(item => new { item.Role })
+                    .SingleOrDefaultAsync(context.HttpContext.RequestAborted);
+                if (account is null)
+                {
+                    context.Fail("Cuenta no disponible.");
+                    return;
+                }
+
+                var identity = (ClaimsIdentity)principal.Identity!;
+                foreach (var claim in identity.FindAll("role").ToArray()) identity.RemoveClaim(claim);
+                identity.AddClaim(new Claim("role", account.Role));
             }
         };
     });

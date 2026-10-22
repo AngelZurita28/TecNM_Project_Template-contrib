@@ -1,5 +1,7 @@
 # Plan de implementación: plantilla TecNM con autenticación local
 
+Plan histórico. Modelo y contratos vigentes: [padrón](../specs/people.spec.md) y [autenticación](../specs/auth.spec.md).
+
 ## 1. Alcance
 
 Se crearán dos proyectos independientes en `backend/` y `frontend/`, siguiendo las arquitecturas vertical slice documentadas en este repositorio.
