@@ -1,19 +1,23 @@
-name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}
+name: ${COMPOSE_PROJECT_NAME:-tecnm-template}
 services:
   db:
     image: postgres:15
-    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-postgres
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-template}-postgres
     environment:
-      POSTGRES_DB: tecnm_identity
+      POSTGRES_DB: tecnm_template
       POSTGRES_USER: tecnm_app
       POSTGRES_PASSWORD: ${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
     volumes:
-      - identity_data:/var/lib/postgresql/data
-      - ./database.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./seed-development.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+      - type: bind
+        source: ./database.sql
+        target: /docker-entrypoint-initdb.d/01-schema.sql
+        read_only: true
+        bind:
+          create_host_path: false
     networks: [data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U tecnm_app -d tecnm_identity"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U tecnm_app -d tecnm_template"]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -21,15 +25,14 @@ services:
 
   backend:
     build: ./backend
-    image: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-backend:local
-    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-backend
+    image: ${COMPOSE_PROJECT_NAME:-tecnm-template}-backend:local
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-template}-backend
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+:8081
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/localhost.crt
       ASPNETCORE_Kestrel__Certificates__Default__KeyPath: /https/localhost.key
-      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=tecnm_identity;Username=tecnm_app;Password=${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
-      Jwt__SecretKey: ${TECNM_JWT_SECRET:?Ejecuta scripts/setup-dev.sh primero}
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=tecnm_template;Username=tecnm_app;Password=${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
       Cors__AllowedOrigins: https://localhost:${TECNM_FRONTEND_PORT:-5173},https://127.0.0.1:${TECNM_FRONTEND_PORT:-5173}
     ports:
       - "127.0.0.1:${TECNM_BACKEND_PORT:-7001}:8081"
@@ -49,8 +52,8 @@ services:
 
   frontend:
     build: ./frontend
-    image: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-frontend:local
-    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-frontend
+    image: ${COMPOSE_PROJECT_NAME:-tecnm-template}-frontend:local
+    container_name: ${COMPOSE_PROJECT_NAME:-tecnm-template}-frontend
     ports:
       - "127.0.0.1:${TECNM_FRONTEND_PORT:-5173}:443"
     volumes:
@@ -68,9 +71,9 @@ services:
 
 networks:
   web:
-    name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-web
+    name: ${COMPOSE_PROJECT_NAME:-tecnm-template}-web
   data:
-    name: ${COMPOSE_PROJECT_NAME:-tecnm-identity}-data
+    name: ${COMPOSE_PROJECT_NAME:-tecnm-template}-data
     internal: true
 volumes:
-  identity_data:
+  postgres_data:

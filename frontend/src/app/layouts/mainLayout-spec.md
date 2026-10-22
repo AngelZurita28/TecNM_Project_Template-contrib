@@ -5,18 +5,17 @@
 Una única ruta padre monta `MainLayout.vue`. Sus rutas hijas aparecen dentro de `RouterView`.
 Al navegar entre páginas hijas, Vue conserva header, sidebar y desplegables; cambia únicamente contenido.
 No usar `key` basada en ruta sobre MainLayout ni duplicarlo dentro de vistas.
-Login vive fuera: entrar o salir de sesión sí monta/desmonta layout.
 Persistente significa conservar componentes durante navegación SPA; recargar navegador reinicia estado.
 
 ## Archivos
 
-- `MainLayout.vue`: composición persistente, tema, logout y `RouterView`.
+- `MainLayout.vue`: composición persistente, tema y `RouterView`.
 - `mainLayout.config.ts`: configuración específica de aplicación y enlaces.
 - `shared/components/UiShell.vue`: estructura y espacio de contenido.
 - `shared/components/UiHeader.vue`: header independiente.
 - `shared/components/UiSidebar.vue`: sidebar independiente.
 - `shared/components/UiNavigation.vue`: enlaces y grupos compartidos.
-- `app/router/index.ts`: ruta padre protegida. Agregar rutas de módulos a `children`.
+- `app/router/index.ts`: ruta padre pública. Agregar rutas de módulos a `children`.
 
 ## Header, sidebar o ambos
 
@@ -30,7 +29,6 @@ Editar `mainLayoutConfig` en `mainLayout.config.ts`:
 | Ninguno | false | false |
 
 Sin sidebar, contenido ocupa ancho disponible. No queda columna vacía.
-Logout aparece en sidebar; sin sidebar, en header; sin ambos, en footer.
 Control de tema aparece en header o, si falta, en sidebar.
 Footer institucional permanece en las cuatro opciones.
 
@@ -62,7 +60,7 @@ Editar `headerNavigation` y `sidebarNavigation`. Mismo contrato para ambos:
   {
     label: 'Gestión',
     children: [
-      { label: 'Alumnos', to: { name: 'students' } },
+      { label: 'Elementos', to: { name: 'items' } },
       { label: 'Reportes', to: '/reportes' },
     ],
   },
@@ -73,7 +71,7 @@ Registrar rutas de ejemplo antes de usarlas. `to` acepta destinos de Vue Router.
 Grupo tiene `children`, sin ruta propia. Un nivel de grupos; hijos son páginas.
 Header despliega panel; sidebar expande lista. Teclado usa Tab, Enter/Espacio y Escape para cerrar.
 En móvil navegación permanece disponible. No se oculta listado del header.
-El padrón enlaza secciones reales: cuenta, identidad, contacto, domicilio y emergencia.
+El template incluye únicamente el enlace Inicio a la ruta pública `/`.
 Reemplazar destinos por páginas reales al agregar módulos; no crear vistas ficticias para template.
 
 ## Verificación
@@ -90,6 +88,6 @@ En móvil, navegación mantiene flujo superior y altura natural.
 
 ## Ancho por página
 
-Usar `UiBasePage` dentro de cada vista autenticada. MainLayout no impone límite central.
+Usar `UiBasePage` dentro de cada vista de página. MainLayout no impone límite central.
 `fluid` ocupa todo ancho disponible; sin `fluid`, máximo 960 px centrados.
-SessionView usa `fluid`. Márgenes responsive siguen en UiShell.
+HomeView usa `fluid`. Márgenes responsive siguen en UiShell.
