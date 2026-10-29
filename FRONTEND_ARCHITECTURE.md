@@ -1,7 +1,7 @@
 # Proyecto Web Frontend
 
 ## ¿Qué es este proyecto?
-Es una aplicación web moderna de tipo **Single-Page Application (SPA)**. Es una base agnóstica para incorporar los módulos que defina cada proyecto. Incluye inicio público, layout persistente, tema y componentes compartidos, sin autenticación activa.
+Es una aplicación web de tipo **Single-Page Application (SPA)**. Es una base agnóstica para incorporar los módulos que defina cada proyecto. Incluye inicio público, layout persistente, tema y componentes compartidos.
 
 ---
 
@@ -11,7 +11,7 @@ Es una aplicación web moderna de tipo **Single-Page Application (SPA)**. Es una
 - **Lenguaje & Tipado:** [TypeScript](https://www.typescriptlang.org/)
 - **Empaquetador & Entorno de Construcción:** [Vite](https://vitejs.dev/)
 - **Enrutamiento:** [Vue Router](https://router.vuejs.org/)
-- **Cliente HTTP:** Axios, sin credenciales ni redirecciones de autenticación preconfiguradas
+- **Cliente HTTP:** Axios con base URL configurable
 - **Estilos & UI:** CSS nativo basado en tokens de diseño semánticos globales y soporte de temas (Dark / Light)
 ---
 
@@ -68,7 +68,7 @@ root/
 - **Enrutamiento Descentralizado:** Cada slice define sus propias rutas (`routes.ts`) con lazy loading, desacoplando la configuración central del router.
 - **Límites Modulares (Public API):** Uso de `index.ts` en cada módulo para exponer únicamente los componentes, tipos o rutas autorizadas para el consumo externo.
 - **Estado Encapsulado:** Los stores y composables residen en el módulo correspondiente, evitando estados globales innecesarios.
-- **Cliente HTTP Centralizado:** Instancia Axios en `shared/api/`. Cada proyecto añade el tratamiento de errores y transporte que requieran sus contratos. La integración futura de identidad se documenta en [AUTH.md](AUTH.md).
+- **Cliente HTTP Centralizado:** Instancia Axios en `shared/api/`. Cada proyecto añade el tratamiento de errores y transporte que requieran sus contratos.
 - **Prevención de Doble Petición (Unicidad de Acción):** Toda acción o mutación iniciada por el usuario debe ejecutarse de forma única sin permitir dobles peticiones. Las vistas y componentes deben deshabilitar visual y funcionalmente los elementos de disparo (`disabled`, `loading`) mientras la operación esté en curso, e incluir guardas de reentrancia en manejadores/composables (`if (isSubmitting.value) return;`) para evitar peticiones duplicadas por clics rápidos o eventos concurrentes.
 - **Co-localización de Tests:** Archivos de prueba (`*.spec.ts`) ubicados junto a sus respectivos componentes o utilidades para preservar la autonomía del slice.
 - **Idioma (Código vs. Interfaz):** Identificadores, componentes, composables, tipos y nombres de archivo se escriben en inglés. Todo texto presentado al usuario (etiquetas, botones, mensajes de error y de estado) se escribe en español de México (es-MX), sin mezclar idiomas en una misma cadena.

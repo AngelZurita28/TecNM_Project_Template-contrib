@@ -12,15 +12,17 @@ Todas las llamadas a `useTheme()` reciben mismo estado mientras aplicación est�
 - `dark=false` asigna `data-theme="light"`.
 - Watch se ejecuta inmediatamente; tema queda aplicado al cargar módulo.
 - Tokens de `global.css` responden a atributo `data-theme`.
-- Estado no se guarda en cookies ni Web Storage. Recargar aplicación vuelve a preferencia del sistema.
+- La elección se conserva en memoria durante la navegación. Recargar la aplicación vuelve a la preferencia del sistema.
 - Cambios posteriores de preferencia del sistema no sustituyen elección activa. Agregar sincronización solo si producto lo requiere.
 
 ## Uso
 
+Ejemplo desde un componente en `src/app/layouts/`:
+
 ```vue
 <script setup lang="ts">
-import { UiToggle } from '@/shared/components'
-import { useTheme } from '@/shared/composables/useTheme'
+import { UiToggle } from '../../shared/components'
+import { useTheme } from '../../shared/composables/useTheme'
 
 const { dark } = useTheme()
 </script>
@@ -31,7 +33,7 @@ const { dark } = useTheme()
 ```
 
 Usar `dark` directamente con `v-model`. No crear otra ref local ni modificar `data-theme` desde vistas.
-MainLayout debe alojar control global de tema para conservarlo durante navegación.
+`MainLayout` aloja el control global de tema durante la navegación entre sus páginas. `NotFoundView` incluye su propio control y comparte el mismo estado.
 
 ## Límites
 

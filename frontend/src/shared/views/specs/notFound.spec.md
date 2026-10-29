@@ -8,7 +8,7 @@ Capturar rutas no coincidentes en la aplicación y proveer navegación de retorn
 
 - Componente: `NotFoundView.vue`.
 - Ruta en router: `/:pathMatch(.*)*`.
-- Acceso: público, sin requerir sesión activa.
+- Acceso: público.
 - Contenedor: diseño autocontenido con encabezado institucional, selector de tema y pie de página.
 - Componentes UI compartidos: `UiCard`, `UiPageHeader`, `UiButton`, `UiText`, `UiToggle`.
 - Textos (es-MX):

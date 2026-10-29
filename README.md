@@ -2,13 +2,7 @@
 
 Base agnóstica para aplicaciones web y microservicios institucionales. Incluye arquitectura modular, backend .NET 10 con EF Core/PostgreSQL, frontend Vue 3/TypeScript y componentes visuales TecNM.
 
-Cada proyecto define su dominio, datos y permisos. El template no incluye padrón, cuentas, semillas ni funcionalidad de negocio. El frontend abre una página pública de inicio.
-
-## Autenticación pendiente
-
-`backend/Modules/Auth/` conserva únicamente la estructura y documentación para conectar la API del servicio de login TecNM cuando se entregue su contrato. No autentica localmente ni expone login, sesión o logout.
-
-Ver [guía de integración](AUTH.md), [spec compartida](specs/auth.spec.md) y [punto de extensión backend](backend/Modules/Auth/Integration/README.md).
+Cada proyecto define su dominio, datos e integraciones. El template incluye una página pública de inicio, componentes reutilizables y un health check del backend.
 
 ## Arranque con Docker
 
@@ -44,7 +38,7 @@ El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, 
 
 El SQL se ejecuta únicamente al inicializar un volumen nuevo. Editarlo y repetir el setup no modifica una base existente: esos cambios requieren la estrategia de migraciones elegida por el proyecto. El volumen `postgres_data` conserva los datos entre reinicios.
 
-Consultar [documentación del setup](docs/setup.md) para opciones, inicialización, errores SQL, persistencia y transición desde la versión anterior.
+Consultar [documentación del setup](docs/setup.md) para opciones, inicialización, errores SQL y persistencia.
 
 ## Desarrollo y verificación
 
@@ -66,13 +60,14 @@ Para ejecutar sin Docker, consultar los `.env.example` de backend/frontend. La e
 ## Arquitectura y contribución
 
 - [Alcance del template](specs/template.spec.md).
-- [Arquitectura backend](BACKEND_ARCHITECTURE.md) y [contexto backend](backend/AGENTS.md).
-- [Arquitectura frontend](FRONTEND_ARCHITECTURE.md) y [contexto frontend](frontend/AGENTS.md).
+- [Arquitectura backend](BACKEND_ARCHITECTURE.md) y [reglas de desarrollo backend](backend/AGENTS.md).
+- [Arquitectura frontend](FRONTEND_ARCHITECTURE.md) y [reglas de desarrollo frontend](frontend/AGENTS.md).
 - [Sistema de diseño](frontend/DESIGN.md) y [componentes compartidos](frontend/src/shared/components/specs/components.spec.md).
+- [Layout persistente](frontend/src/app/layouts/mainLayout.spec.md), [tema](frontend/src/shared/composables/useTheme.spec.md), [inicio](frontend/src/modules/home/specs/home.spec.md) y [página 404](frontend/src/shared/views/specs/notFound.spec.md).
 - [Contrato Docker](specs/docker.spec.md) y [health check](specs/health.spec.md).
 
-Aplicar SDD: actualizar la especificación local del módulo antes de modificar código. Registrar módulos nuevos en su `AGENTS.md`. Los planes de implementación de cada proyecto pueden mantenerse en `plans/`.
+Aplicar SDD: actualizar la especificación correspondiente antes de modificar comportamiento o contratos. Documentar funcionalidades y criterios de aceptación en `specs/`; mantener los `AGENTS.md` centrados en patrones de diseño y reglas de desarrollo.
 
 Convenciones: objetos PostgreSQL en `snake_case`; código, rutas y archivos en inglés; interfaz, errores y documentación en español de México. Reutilizar componentes antes de crear controles o estilos locales.
 
-Skills recomendadas para contribuir: `caveman`, `ponytail`, `frontend-design` y `ui-ux-pro-max`. Revisar las instrucciones de cada `AGENTS.md` antes de trabajar en su área.
+Revisar las instrucciones de cada `AGENTS.md` antes de trabajar en su área.

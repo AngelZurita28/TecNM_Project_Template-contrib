@@ -8,7 +8,7 @@
 - PostgreSQL sin puerto publicado; comparte red `internal: true` únicamente con backend.
 - Volumen `postgres_data` persistente; base `tecnm_template`, usuario `tecnm_app`.
 - Puerto frontend 5173 y backend 7001, publicados solo en `127.0.0.1`; configurables por flags y `.env`.
-- Certificado autofirmado y contraseña PostgreSQL generados fuera de Git. Sin secretos JWT.
+- Certificado autofirmado y contraseña PostgreSQL generados fuera de Git.
 
 ## Inicialización SQL
 

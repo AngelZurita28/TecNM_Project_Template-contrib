@@ -60,7 +60,7 @@ with tempfile.TemporaryDirectory() as directory:
             first_settings = setup.read_settings()
             assert first_settings['COMPOSE_PROJECT_NAME'] == 'tecnm-template'
             password = first_settings['TECNM_DB_PASSWORD']
-            assert password and 'TECNM_JWT_SECRET' not in first_settings
+            assert password
             assert env_file.stat().st_mode & 0o777 == 0o600
             assert not any('exec' in command or 'down' in command for command in commands)
 

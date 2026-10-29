@@ -19,7 +19,7 @@ Requiere Docker con Compose y daemon activo, Python 3 y OpenSSL. Frontend y back
 | `--project-name` | `tecnm-template` | Nombre de proyecto Compose, contenedores y volumen |
 | `--check-ports` | Desactivado | Solo comprueba puertos; no crea archivos ni cambia contenedores |
 
-Los valores persistidos en `.env` sustituyen los predeterminados. El script preserva configuración ajena y contraseña existente. Si falta `TECNM_DB_PASSWORD`, genera una contraseña aleatoria. No genera secretos de autenticación.
+Los valores persistidos en `.env` sustituyen los predeterminados. El script preserva configuración ajena y contraseña existente. Si falta `TECNM_DB_PASSWORD`, genera una contraseña aleatoria.
 
 Puertos distintos, entre 1 y 65535, publicados solo en `127.0.0.1`. Un conflicto propone alternativa; permite elegir en terminal y termina con código 2 si no hay interacción. No detiene procesos ajenos.
 
@@ -42,7 +42,7 @@ El archivo incluido solo contiene comentarios; permite arrancar sin tablas de ap
 
 - Definir tablas, relaciones, índices, restricciones y vistas propios; usar `snake_case`.
 - Mantener el SQL alineado con entidades y configuraciones de `backend/Data/`.
-- El template no carga semillas adicionales ni depende de tablas de usuarios o personas.
+- El template no carga semillas adicionales ni depende de tablas de negocio.
 - No aplica migraciones EF, `EnsureCreated` ni SQL adicional desde backend o script.
 - Si se eligen migraciones u otro mecanismo, actualizar también esta documentación y las specs del proyecto.
 
@@ -80,12 +80,6 @@ Un fallo en `database.sql` puede dejar una inicialización parcial. Si PostgreSQ
 
 Una base ya inicializada puede arrancar tras un reinicio automático o en un intento posterior aunque el SQL previo haya fallado. El health check solo verifica disponibilidad de PostgreSQL; cada microservicio debe comprobar su esquema y adoptar migraciones controladas.
 
-## Transición desde el template de padrón
-
-Esta versión usa base `tecnm_template` y volumen `postgres_data`. No migra, borra ni reutiliza automáticamente el volumen anterior `identity_data` ni sus tablas. Se conserva cualquier `.env` existente; revisar `COMPOSE_PROJECT_NAME` si aún apunta al proyecto anterior. Elegir otro proyecto y puertos permite mantener ambos entornos separados.
-
-Los datos anteriores permanecen en su volumen original. Su respaldo o migración corresponde al proyecto que los necesite.
-
 ## Verificación
 
 ```bash
@@ -94,4 +88,4 @@ python3 scripts/check-setup.py
 API_URL=https://localhost:7001 bash scripts/smoke-template.sh
 ```
 
-La prueba HTTP requiere curl y Python 3. Verifica health check, ausencia de cookies de sesión y `404` en las antiguas rutas de autenticación y padrón. No prueba la integración TecNM, que está pendiente.
+La prueba HTTP requiere curl y Python 3. Verifica la respuesta del health check y un `404` para una ruta de API no registrada.

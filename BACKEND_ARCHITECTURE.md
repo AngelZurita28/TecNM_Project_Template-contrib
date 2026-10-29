@@ -1,7 +1,7 @@
 # Proyecto Web Backend
 
 ## Descripción
-**Proyecto Web Backend** es una API RESTful moderna desarrollada sobre el ecosistema .NET. Es una base agnóstica para incorporar la lógica y persistencia de cada microservicio mediante una arquitectura modular. Incluye health check y un DbContext sin entidades. `Modules/Auth` reserva únicamente la integración futura con la API de login TecNM; no autentica.
+**Proyecto Web Backend** es una API RESTful desarrollada sobre el ecosistema .NET. Es una base agnóstica para incorporar la lógica y persistencia de cada microservicio mediante una arquitectura modular. Incluye health check y un DbContext sin entidades.
 
 ---
 
@@ -54,5 +54,3 @@ Proyecto Web Backend/
 ## Inicialización y extensiones
 
 El esquema de cada microservicio se define en [`database.sql`](database.sql), ejecutado por PostgreSQL al inicializar un volumen nuevo. No se aplican migraciones ni se crean tablas desde el backend. Cada equipo completa el SQL y los mapeos EF o adapta ese mecanismo; ver [setup](docs/setup.md).
-
-Autenticación: seguir [AUTH.md](AUTH.md) y el contrato oficial del servicio TecNM antes de implementar cliente, middleware o rutas protegidas. No se incluyen contraseñas, cuentas, tokens ni cookies locales.

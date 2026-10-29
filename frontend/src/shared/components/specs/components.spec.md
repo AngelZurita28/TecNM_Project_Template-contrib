@@ -24,7 +24,7 @@ Conservar identidad TecNM, soporte claro/oscuro y CSS nativo. No agregar depende
 
 ## Página base
 
-Todas las vistas de página, públicas o autenticadas, deben usar `UiBasePage` como contenedor de contenido raíz.
+Las vistas de página dentro del layout deben usar `UiBasePage` como contenedor de contenido raíz.
 
 ```vue
 <UiBasePage fluid title="Bienvenida" description="Tu plataforma institucional">
@@ -78,12 +78,12 @@ Todas las vistas de página, públicas o autenticadas, deben usar `UiBasePage` c
 - `UiPageHeader`: `title`, `description`, `version`, `eyebrow` y slot de acciones.
 - `UiLayout`: `kind="stack|grid|row|fields"`, `as` para elemento semántico.
 
-Ejemplo mínimo:
+Ejemplo mínimo desde una vista en `src/modules/<feature>/views/`:
 
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { UiBasePage, UiButton, UiCard, UiField } from '@/shared/components'
+import { UiBasePage, UiButton, UiCard, UiField } from '../../../shared/components'
 
 const name = ref('')
 </script>
@@ -107,7 +107,7 @@ const name = ref('')
 - Navegación acepta enlaces `{ label, to }` y grupos `{ label, children }` sin destino propio.
 - `to` acepta cualquier `RouteLocationRaw` de Vue Router.
 - Desplegables funcionan con teclado; Escape cierra grupo. Estado lateral permanece entre páginas hijas.
-- Configuración y guía completa: `frontend/src/app/layouts/mainLayout-spec.md`.
+- Configuración y guía completa: [spec de MainLayout](../../../app/layouts/mainLayout.spec.md).
 
 ## Barra lateral en escritorio
 
@@ -120,7 +120,7 @@ const name = ref('')
 
 - `HomeView`: bienvenida pública sin datos ni operaciones de negocio.
 - `MainLayout`: navegación persistente y tema.
-- Autenticación pendiente exclusivamente en backend; ver `AUTH.md`.
+- `NotFoundView`: página 404 con navegación al inicio y selector de tema compartido.
 
 ## Verificación
 
