@@ -13,6 +13,7 @@
 ## Especificaciones y documentación
 
 - Aplicar SDD: actualizar la especificación correspondiente antes de cambiar comportamiento o contratos.
+- Al preparar specs frontend, verificar la disponibilidad de `grilling` y priorizarla para aclarar decisiones relevantes de producto, flujos o contratos; omitir la entrevista si el cambio es simple y claro. Si falta, informar y seguir la guía de [instalación y uso](../CONTRIBUTING.md#skill-grilling); aclarar de todos modos las decisiones pendientes.
 - Documentar requisitos, flujos y criterios de aceptación en specs cercanas al código; usar nombres `*.spec.md`.
 - Reservar `AGENTS.md` para patrones y reglas de trabajo; no duplicar aquí contratos funcionales ni inventarios de funcionalidades.
 - Consultar la [arquitectura frontend](../FRONTEND_ARCHITECTURE.md) al cambiar estructura y el [sistema de diseño](./DESIGN.md) al modificar UI.

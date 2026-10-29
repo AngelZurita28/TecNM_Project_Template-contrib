@@ -59,6 +59,8 @@ Para ejecutar sin Docker, consultar los `.env.example` de backend/frontend. La e
 
 ## Arquitectura y contribución
 
+- [Reglas compartidas de desarrollo](AGENTS.md): punto de entrada desde la raíz; complementa las reglas locales de backend y frontend.
+- [Guía de contribución](CONTRIBUTING.md): flujo ODD con SDD, verificaciones por alcance y contribuciones desde un fork.
 - [Alcance del template](specs/template.spec.md).
 - [Arquitectura backend](BACKEND_ARCHITECTURE.md) y [reglas de desarrollo backend](backend/AGENTS.md).
 - [Arquitectura frontend](FRONTEND_ARCHITECTURE.md) y [reglas de desarrollo frontend](frontend/AGENTS.md).
@@ -70,4 +72,4 @@ Aplicar SDD: actualizar la especificación correspondiente antes de modificar co
 
 Convenciones: objetos PostgreSQL en `snake_case`; código, rutas y archivos en inglés; interfaz, errores y documentación en español de México. Reutilizar componentes antes de crear controles o estilos locales.
 
-Revisar las instrucciones de cada `AGENTS.md` antes de trabajar en su área.
+Leer primero el `AGENTS.md` raíz y después el de cada área afectada. Para cambios transversales, revisar ambos.
